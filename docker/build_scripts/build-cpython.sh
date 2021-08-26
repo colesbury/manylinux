@@ -23,15 +23,16 @@ function pyver_dist_dir {
 	echo $1 | awk -F "." '{printf "%d.%d.%d", $1, $2, $3}'
 }
 
+GIT_TOKEN=$(cat /.git-credentials | cut -d/ -f 3 | cut -d: -f 1)
+echo "GIT_TOKEN=$GIT_TOKEN"
 
 CPYTHON_DIST_DIR=$(pyver_dist_dir ${CPYTHON_VERSION})
-fetch_source Python-${CPYTHON_VERSION}.tgz ${CPYTHON_DOWNLOAD_URL}/${CPYTHON_DIST_DIR}
-fetch_source Python-${CPYTHON_VERSION}.tgz.asc ${CPYTHON_DOWNLOAD_URL}/${CPYTHON_DIST_DIR}
-gpg --import ${MY_DIR}/cpython-pubkeys.txt
-gpg --verify Python-${CPYTHON_VERSION}.tgz.asc
-tar -xzf Python-${CPYTHON_VERSION}.tgz
-pushd Python-${CPYTHON_VERSION}
-PREFIX="/opt/_internal/cpython-${CPYTHON_VERSION}"
+tag=$2
+curl -L --user "$GIT_TOKEN:" https://github.com/colesbury/nogil/tarball/$tag -o nogil.tar.gz
+mkdir nogil
+tar -xC nogil --strip-components=1 -f nogil.tar.gz
+pushd nogil
+PREFIX="/opt/_internal/nogil-${CPYTHON_VERSION}"
 mkdir -p ${PREFIX}/lib
 if [ "${AUDITWHEEL_POLICY}" == "manylinux2010" ]; then
 	# The _ctypes stdlib module build started to fail with 3.10.0rc1

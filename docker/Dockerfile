@@ -108,41 +108,15 @@ RUN export OPENSSL_ROOT=openssl-1.1.1k && \
 
 COPY build_scripts/build-cpython.sh /build_scripts/
 
-
-FROM build_cpython AS build_cpython36
-COPY build_scripts/cpython-pubkeys.txt /build_scripts/cpython-pubkeys.txt
-RUN manylinux-entrypoint /build_scripts/build-cpython.sh 3.6.14
-
-
-FROM build_cpython AS build_cpython37
-COPY build_scripts/cpython-pubkeys.txt /build_scripts/cpython-pubkeys.txt
-RUN manylinux-entrypoint /build_scripts/build-cpython.sh 3.7.11
-
-
-FROM build_cpython AS build_cpython38
+FROM build_cpython AS build_nogil39
 COPY build_scripts/ambv-pubkey.txt /build_scripts/cpython-pubkeys.txt
-RUN manylinux-entrypoint /build_scripts/build-cpython.sh 3.8.11
-
-
-FROM build_cpython AS build_cpython39
-COPY build_scripts/ambv-pubkey.txt /build_scripts/cpython-pubkeys.txt
-RUN manylinux-entrypoint /build_scripts/build-cpython.sh 3.9.6
-
-
-FROM build_cpython AS build_cpython310
-COPY build_scripts/cpython-pubkey-310-311.txt /build_scripts/cpython-pubkeys.txt
-RUN manylinux-entrypoint /build_scripts/build-cpython.sh 3.10.0rc1
-
+ARG PYTHON_VERSION=3.9.9
+ARG COMMIT_SHA
+RUN --mount=type=secret,id=git-credentials,dst=/.git-credentials \
+    manylinux-entrypoint /build_scripts/build-cpython.sh $PYTHON_VERSION $COMMIT_SHA
 
 FROM build_cpython AS all_python
-COPY build_scripts/install-pypy.sh /build_scripts/install-pypy.sh
-COPY build_scripts/pypy.sha256 /build_scripts/pypy.sha256
-RUN manylinux-entrypoint /build_scripts/install-pypy.sh 3.7 7.3.5
-COPY --from=build_cpython36 /opt/_internal /opt/_internal/
-COPY --from=build_cpython37 /opt/_internal /opt/_internal/
-COPY --from=build_cpython38 /opt/_internal /opt/_internal/
-COPY --from=build_cpython39 /opt/_internal /opt/_internal/
-COPY --from=build_cpython310 /opt/_internal /opt/_internal/
+COPY --from=build_nogil39 /opt/_internal /opt/_internal/
 RUN hardlink -cv /opt/_internal
 
 

@@ -10,7 +10,8 @@ MY_DIR=$(dirname "${BASH_SOURCE[0]}")
 source $MY_DIR/build_utils.sh
 
 mkdir /opt/python
-for PREFIX in $(find /opt/_internal/ -mindepth 1 -maxdepth 1 \( -name 'cpython*' -o -name 'pypy*' \)); do
+
+for PREFIX in $(find /opt/_internal/ -mindepth 1 -maxdepth 1 \( -name 'cpython*' -o -name 'pypy*' -o -name 'nogil*' \)); do
 	# Some python's install as bin/python3. Make them available as
 	# bin/python.
 	if [ -e ${PREFIX}/bin/python3 ] && [ ! -e ${PREFIX}/bin/python ]; then
@@ -37,7 +38,7 @@ done
 
 # Create venv for auditwheel & certifi
 TOOLS_PATH=/opt/_internal/tools
-/opt/python/cp39-cp39/bin/python -m venv $TOOLS_PATH
+/opt/python/$ABI_TAG/bin/python -m venv $TOOLS_PATH
 source $TOOLS_PATH/bin/activate
 
 # Install default packages
