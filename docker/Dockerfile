@@ -112,8 +112,7 @@ FROM build_cpython AS build_nogil39
 COPY build_scripts/ambv-pubkey.txt /build_scripts/cpython-pubkeys.txt
 ARG PYTHON_VERSION=3.9.9
 ARG COMMIT_SHA
-RUN --mount=type=secret,id=git-credentials,dst=/.git-credentials \
-    manylinux-entrypoint /build_scripts/build-cpython.sh $PYTHON_VERSION $COMMIT_SHA
+RUN manylinux-entrypoint /build_scripts/build-cpython.sh $PYTHON_VERSION $COMMIT_SHA
 
 FROM build_cpython AS all_python
 COPY --from=build_nogil39 /opt/_internal /opt/_internal/

@@ -75,7 +75,6 @@ BUILD_ARGS_COMMON="
 	--build-arg POLICY --build-arg PLATFORM --build-arg BASEIMAGE
 	--build-arg DEVTOOLSET_ROOTPATH --build-arg PREPEND_PATH --build-arg LD_LIBRARY_PATH_ARG
 	--build-arg PYTHON_VERSION --build-arg COMMIT_SHA
-	--secret id=git-credentials,src=$HOME/.git-credentials
 	--rm -t nogil/${POLICY}_${PLATFORM}:${COMMIT_SHA}
 	-f docker/Dockerfile docker/
 "

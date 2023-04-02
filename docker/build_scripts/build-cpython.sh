@@ -23,12 +23,9 @@ function pyver_dist_dir {
 	echo $1 | awk -F "." '{printf "%d.%d.%d", $1, $2, $3}'
 }
 
-GIT_TOKEN=$(cat /.git-credentials | cut -d/ -f 3 | cut -d: -f 1)
-echo "GIT_TOKEN=$GIT_TOKEN"
-
 CPYTHON_DIST_DIR=$(pyver_dist_dir ${CPYTHON_VERSION})
 tag=$2
-curl -L --user "$GIT_TOKEN:" https://github.com/colesbury/nogil/tarball/$tag -o nogil.tar.gz
+curl -L  https://github.com/colesbury/nogil/tarball/$tag -o nogil.tar.gz
 mkdir nogil
 tar -xC nogil --strip-components=1 -f nogil.tar.gz
 pushd nogil
